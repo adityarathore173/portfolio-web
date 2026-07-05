@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aditya Rathore · 3D Premium</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet" />
+  <!-- Font Awesome 6 (free) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background-color: #0b0d10;
+      font-family: 'Inter', sans-serif;
+      color: #eef2f6;
+      line-height: 1.5;
+      overflow-x: hidden;
+    }
+
+    /* ---- scrollbar premium ---- */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #181c22;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #c0a86a;
+      border-radius: 12px;
+    }
+
+    /* ---- 3D canvas container ---- */
+    #three-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* ---- main content overlay ---- */
+    .main-content {
+      position: relative;
+      z-index: 10;
+      max-width: 1320px;
+      margin: 0 auto;
+      padding: 2.5rem 2rem 5rem;
+      backdrop-filter: blur(1px);
+    }
+
+    /* ---- glassmorphism cards ---- */
+    .glass {
+      background: rgba(20, 24, 30, 0.55);
+      backdrop-filter: blur(14px) saturate(160%);
+      -webkit-backdrop-filter: blur(14px) saturate(160%);
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      border-radius: 2.5rem;
+      box-shadow: 0 25px 45px -12px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.03);
+      transition: transform 0.3s ease, box-shadow 0.4s ease;
+    }
+
+    .glass:hover {
+      box-shadow: 0 35px 60px -18px rgba(192, 168, 106, 0.12), inset 0 1px 0 rgba(255, 215, 140, 0.05);
+    }
+
+    /* ---- header ---- */
+    .hero {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      padding: 2.8rem 3rem;
+      margin-bottom: 3.5rem;
+      background: rgba(12, 15, 20, 0.5);
+      backdrop-filter: blur(16px) saturate(170%);
+      border: 1px solid rgba(255, 215, 140, 0.06);
+    }
+
+    .hero-left h1 {
+      font-size: 3.4rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      background: linear-gradient(135deg, #f3e7c9, #d8c69a);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      display: inline-block;
+    }
+
+    .hero-left .badge {
+      display: inline-block;
+      background: rgba(192, 168, 106, 0.18);
+      border: 1px solid rgba(192, 168, 106, 0.25);
+      border-radius: 100px;
+      padding: 0.35rem 1.4rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: #d4bf8b;
+      margin-top: 0.5rem;
+    }
+
+    .hero-right {
+      display: flex;
+      gap: 1.8rem;
+      font-size: 1.1rem;
+      color: #b6bfcc;
+    }
+    .hero-right i {
+      color: #c6b07a;
+      margin-right: 8px;
+    }
+    .hero-right a {
+      color: #e2e8f0;
+      text-decoration: none;
+      border-bottom: 1px solid transparent;
+      transition: 0.2s;
+    }
+    .hero-right a:hover {
+      color: #f5e5c4;
+      border-bottom-color: #c6b07a;
+    }
+
+    /* ---- about grid ---- */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1.3fr 0.9fr;
+      gap: 2rem;
+      margin-bottom: 3rem;
+    }
+
+    .about-card {
+      padding: 2.2rem 2.5rem;
+    }
+
+    .about-card h2 {
+      font-size: 1.3rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      color: #e8decf;
+      margin-bottom: 1.2rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .about-card h2 i {
+      color: #c9b27c;
+      font-size: 1.5rem;
+    }
+
+    .about-card p {
+      color: #ccd4df;
+      font-weight: 300;
+      font-size: 1rem;
+      line-height: 1.7;
+      margin-bottom: 1rem;
+    }
+
+    .highlight {
+      color: #e0d0b0;
+      font-weight: 400;
+    }
+
+    .pill-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem 0.9rem;
+      margin-top: 1.8rem;
+    }
+    .pill {
+      background: rgba(192, 168, 106, 0.08);
+      border: 1px solid rgba(192, 168, 106, 0.12);
+      padding: 0.3rem 1.4rem;
+      border-radius: 40px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: #d2c4a8;
+      letter-spacing: 0.02em;
+      backdrop-filter: blur(4px);
+    }
+
+    /* ---- stats / contact ---- */
+    .info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-bottom: 3rem;
+    }
+
+    .info-item {
+      padding: 1.6rem 2rem;
+      display: flex;
+      align-items: center;
+      gap: 1.2rem;
+    }
+    .info-item i {
+      font-size: 2rem;
+      color: #c9b27c;
+      width: 2.8rem;
+      text-align: center;
+    }
+    .info-item .label {
+      font-weight: 300;
+      color: #949fb0;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .info-item .value {
+      font-weight: 500;
+      font-size: 1rem;
+      color: #eef2f6;
+    }
+
+    /* ---- skills & interests ---- */
+    .skill-section {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 2rem;
+      margin-bottom: 3rem;
+    }
+
+    .skill-card {
+      padding: 2rem 2.2rem;
+    }
+
+    .skill-card h3 {
+      font-weight: 600;
+      font-size: 1.1rem;
+      letter-spacing: -0.01em;
+      color: #ddd2bd;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .skill-card h3 i {
+      color: #c9b27c;
+    }
+
+    .skill-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.7rem 1rem;
+    }
+    .skill-tag {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 215, 140, 0.06);
+      padding: 0.4rem 1.2rem;
+      border-radius: 60px;
+      font-size: 0.85rem;
+      font-weight: 400;
+      color: #d6dce6;
+      transition: all 0.2s;
+      backdrop-filter: blur(2px);
+    }
+    .skill-tag:hover {
+      background: rgba(192, 168, 106, 0.08);
+      border-color: rgba(192, 168, 106, 0.25);
+      color: #f0e4cd;
+      transform: translateY(-2px);
+    }
+
+    .interest-tag {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 215, 140, 0.05);
+      padding: 0.3rem 1.2rem;
+      border-radius: 60px;
+      font-size: 0.8rem;
+      color: #bcc6d4;
+    }
+
+    /* ---- philosophy & looking ahead ---- */
+    .philosophy-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      margin-bottom: 3rem;
+    }
+
+    .phil-card {
+      padding: 2rem 2.2rem;
+    }
+    .phil-card h3 {
+      font-weight: 600;
+      font-size: 1.1rem;
+      color: #ddd2bd;
+      margin-bottom: 0.8rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .phil-card h3 i {
+      color: #c9b27c;
+    }
+    .phil-card p {
+      color: #c9d2df;
+      font-weight: 300;
+      line-height: 1.7;
+    }
+
+    /* ---- footer / connect ---- */
+    .connect-card {
+      padding: 2rem 2.8rem;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(12, 15, 20, 0.5);
+      border: 1px solid rgba(255, 215, 140, 0.04);
+    }
+    .connect-left h4 {
+      font-weight: 600;
+      font-size: 1.1rem;
+      color: #e4dac8;
+    }
+    .connect-left p {
+      font-weight: 300;
+      color: #a4b0c2;
+      font-size: 0.9rem;
+      margin-top: 4px;
+    }
+    .connect-right {
+      display: flex;
+      gap: 2.2rem;
+      align-items: center;
+    }
+    .connect-right a {
+      color: #cfd8e5;
+      font-size: 1rem;
+      text-decoration: none;
+      transition: 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .connect-right a i {
+      color: #c9b27c;
+      font-size: 1.3rem;
+    }
+    .connect-right a:hover {
+      color: #f5e5c4;
+    }
+
+    /* ---- responsive ---- */
+    @media (max-width: 1024px) {
+      .grid-2, .skill-section, .philosophy-grid {
+        grid-template-columns: 1fr;
+      }
+      .hero {
+        flex-direction: column;
+        align-items: start;
+        gap: 1.5rem;
+      }
+      .hero-right {
+        flex-wrap: wrap;
+        gap: 1rem;
+      }
+      .info-grid {
+        grid-template-columns: 1fr;
+      }
+      .connect-card {
+        flex-direction: column;
+        align-items: start;
+        gap: 1.5rem;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .hero-left h1 {
+        font-size: 2.4rem;
+      }
+      .about-card, .skill-card, .phil-card, .info-item {
+        padding: 1.5rem;
+      }
+    }
+
+    /* ---- subtle animations ---- */
+    .fade-in {
+      animation: fadeUp 0.8s ease forwards;
+      opacity: 0;
+    }
+    .fade-in:nth-child(2) { animation-delay: 0.1s; }
+    .fade-in:nth-child(3) { animation-delay: 0.2s; }
+    .fade-in:nth-child(4) { animation-delay: 0.3s; }
+    .fade-in:nth-child(5) { animation-delay: 0.4s; }
+    .fade-in:nth-child(6) { animation-delay: 0.5s; }
+
+    @keyframes fadeUp {
+      0% { opacity: 0; transform: translateY(18px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    /* floating shine */
+    .glow-line {
+      width: 100%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(192, 168, 106, 0.15), transparent);
+      margin: 2rem 0;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 3D CANVAS -->
+  <div id="three-container"></div>
+
+  <!-- MAIN CONTENT -->
+  <div class="main-content">
+
+    <!-- HERO -->
+    <header class="hero glass fade-in">
+      <div class="hero-left">
+        <h1>Aditya Rathore</h1>
+        <div class="badge"><i class="fas fa-code" style="margin-right: 6px;"></i> Business Economics · Data & AI</div>
+      </div>
+      <div class="hero-right">
+        <span><i class="fas fa-map-pin"></i> Delhi, India</span>
+        <span><i class="fas fa-calendar-alt"></i> 19 years</span>
+        <a href="mailto:adityarathore173006@gmail.com"><i class="fas fa-envelope"></i> Email</a>
+      </div>
+    </header>
+
+    <!-- ABOUT + STATS -->
+    <div class="grid-2 fade-in">
+      <div class="about-card glass">
+        <h2><i class="fas fa-user-astronaut"></i> About Me</h2>
+        <p>I'm a 19-year-old undergraduate student with a strong interest in <span class="highlight">data analytics, AI, and business strategy</span>. I enjoy understanding how data drives decisions and how technology can solve real-world business problems.</p>
+        <p>Currently pursuing <span class="highlight">B.A. (Hons.) Business Economics</span> at Aryabhatta College, University of Delhi. Alongside academics, I continuously learn technical skills to build a career in data analytics and AI.</p>
+        <div class="pill-group">
+          <span class="pill"><i class="fas fa-graduation-cap" style="margin-right: 6px;"></i> B.A. Business Econ</span>
+          <span class="pill"><i class="fas fa-chart-line"></i> Data Analytics</span>
+          <span class="pill"><i class="fas fa-brain"></i> AI Enthusiast</span>
+        </div>
+      </div>
+
+      <div class="info-grid" style="display: flex; flex-direction: column; gap: 1rem;">
+        <div class="info-item glass">
+          <i class="fas fa-phone-alt"></i>
+          <div><div class="label">Phone</div><div class="value">+91 93101 23221</div></div>
+        </div>
+        <div class="info-item glass">
+          <i class="fas fa-map-marker-alt"></i>
+          <div><div class="label">Location</div><div class="value">Kanhaiya Nagar, Delhi</div></div>
+        </div>
+        <div class="info-item glass">
+          <i class="fas fa-calendar-check"></i>
+          <div><div class="label">Birth</div><div class="value">17 March 2007</div></div>
+        </div>
+        <div class="info-item glass">
+          <i class="fas fa-university"></i>
+          <div><div class="label">Education</div><div class="value">B.A. (Hons) Business Economics</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SKILLS + INTERESTS -->
+    <div class="skill-section fade-in">
+      <div class="skill-card glass">
+        <h3><i class="fas fa-cog"></i> Skills I'm Developing</h3>
+        <div class="skill-tags">
+          <span class="skill-tag">Excel</span>
+          <span class="skill-tag">SQL</span>
+          <span class="skill-tag">Python</span>
+          <span class="skill-tag">Power BI</span>
+          <span class="skill-tag">Tableau</span>
+          <span class="skill-tag">Statistics</span>
+          <span class="skill-tag">Data Cleaning</span>
+          <span class="skill-tag">Data Visualization</span>
+          <span class="skill-tag">AI Tools</span>
+          <span class="skill-tag">Prompt Engineering</span>
+          <span class="skill-tag">Analytical Thinking</span>
+          <span class="skill-tag">Problem Solving</span>
+        </div>
+      </div>
+      <div class="skill-card glass">
+        <h3><i class="fas fa-heart"></i> Areas of Interest</h3>
+        <div class="skill-tags" style="gap: 0.5rem;">
+          <span class="interest-tag">Data Analytics</span>
+          <span class="interest-tag">Artificial Intelligence</span>
+          <span class="interest-tag">Business Intelligence</span>
+          <span class="interest-tag">Data Visualization</span>
+          <span class="interest-tag">Business Strategy</span>
+          <span class="interest-tag">Machine Learning</span>
+          <span class="interest-tag">Economic Analysis</span>
+          <span class="interest-tag">Financial Analytics</span>
+          <span class="interest-tag">Technology & Innovation</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- PHILOSOPHY + LOOKING AHEAD -->
+    <div class="philosophy-grid fade-in">
+      <div class="phil-card glass">
+        <h3><i class="fas fa-feather-alt"></i> My Philosophy</h3>
+        <p>I believe that hard work, consistency, and curiosity are the foundation of long-term success. Every new concept I learn and every challenge I overcome brings me one step closer to achieving my goals.</p>
+        <p style="margin-top: 0.7rem;">I don't aim to be successful overnight—I aim to build a career that reflects dedication, continuous improvement, and meaningful impact.</p>
+      </div>
+      <div class="phil-card glass">
+        <h3><i class="fas fa-rocket"></i> Looking Ahead</h3>
+        <p>Over the next few years, I plan to strengthen my expertise in data analytics, AI, and business intelligence by working on practical projects, earning industry-recognized certifications, and gaining hands-on experience through internships and professional opportunities.</p>
+        <p style="margin-top: 0.7rem;">My mission is to become a highly skilled data professional who transforms raw data into actionable insights.</p>
+      </div>
+    </div>
+
+    <!-- CONNECT -->
+    <div class="connect-card glass fade-in">
+      <div class="connect-left">
+        <h4><i class="fas fa-handshake" style="color: #c9b27c; margin-right: 10px;"></i>Let's Connect</h4>
+        <p>Open to conversations with mentors, recruiters, and fellow learners.</p>
+      </div>
+      <div class="connect-right">
+        <a href="mailto:adityarathore173006@gmail.com"><i class="fas fa-envelope"></i> Email</a>
+        <a href="#"><i class="fab fa-linkedin-in"></i> LinkedIn</a>
+        <a href="#"><i class="fab fa-github"></i> GitHub</a>
+        <a href="#"><i class="fab fa-twitter"></i> Twitter</a>
+      </div>
+    </div>
+
+    <div class="glow-line" style="margin-top: 2.5rem;"></div>
+    <p style="text-align: center; font-size: 0.7rem; letter-spacing: 0.08em; color: #5d677a; font-weight: 300;">© 2026 Aditya Rathore · built with precision</p>
+  </div>
+
+  <!-- Three.js + custom 3D -->
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://unpkg.com/three@0.126.0/build/three.module.js"
+      }
+    }
+  </script>
+
+  <script type="module">
+    import * as THREE from 'three';
+
+    const container = document.getElementById('three-container');
+    const scene = new THREE.Scene();
+    scene.background = null; // transparent
+
+    const camera = new THREE.PerspectiveCamera(30, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.set(0, 0, 12);
+
+    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    container.appendChild(renderer.domElement);
+
+    // ---- LIGHTS ----
+    const ambientLight = new THREE.AmbientLight(0x404060);
+    scene.add(ambientLight);
+
+    const dirLight = new THREE.DirectionalLight(0xffeedd, 1.2);
+    dirLight.position.set(2, 3, 4);
+    scene.add(dirLight);
+
+    const backLight = new THREE.PointLight(0x446688, 0.8);
+    backLight.position.set(-3, -1, -5);
+    scene.add(backLight);
+
+    const goldLight = new THREE.PointLight(0xc9b27c, 0.6);
+    goldLight.position.set(4, 2, 6);
+    scene.add(goldLight);
+
+    // ---- MAIN OBJECT: floating torus knot + ring system ----
+    const group = new THREE.Group();
+
+    // core knot
+    const geo = new THREE.TorusKnotGeometry(0.9, 0.3, 140, 16);
+    const mat = new THREE.MeshStandardMaterial({
+      color: 0xd8c69a,
+      roughness: 0.25,
+      metalness: 0.7,
+      emissive: 0x2a2218,
+      emissiveIntensity: 0.3,
+      wireframe: false,
+    });
+    const knot = new THREE.Mesh(geo, mat);
+    knot.scale.set(1, 1, 1);
+    group.add(knot);
+
+    // inner glow ring
+    const ringGeo = new THREE.TorusGeometry(1.2, 0.02, 32, 100);
+    const ringMat = new THREE.MeshStandardMaterial({
+      color: 0xc9b27c,
+      emissive: 0x5a4c30,
+      emissiveIntensity: 0.5,
+      transparent: true,
+      opacity: 0.5,
+    });
+    const ring = new THREE.Mesh(ringGeo, ringMat);
+    ring.rotation.x = Math.PI / 2;
+    ring.rotation.z = 0.3;
+    group.add(ring);
+
+    // outer faint ring
+    const ring2Geo = new THREE.TorusGeometry(1.6, 0.015, 24, 120);
+    const ring2Mat = new THREE.MeshStandardMaterial({
+      color: 0xbfaa7a,
+      emissive: 0x332a1a,
+      transparent: true,
+      opacity: 0.25,
+    });
+    const ring2 = new THREE.Mesh(ring2Geo, ring2Mat);
+    ring2.rotation.x = 1.2;
+    ring2.rotation.y = 0.5;
+    group.add(ring2);
+
+    // small orbiting particles
+    const particleCount = 180;
+    const particleGeo = new THREE.BufferGeometry();
+    const posArray = new Float32Array(particleCount * 3);
+    for (let i = 0; i < particleCount; i++) {
+      const theta = Math.random() * Math.PI * 2;
+      const phi = Math.acos((Math.random() * 2) - 1);
+      const r = 2.0 + Math.random() * 1.2;
+      posArray[i*3] = Math.sin(phi) * Math.cos(theta) * r;
+      posArray[i*3+1] = Math.sin(phi) * Math.sin(theta) * r;
+      posArray[i*3+2] = Math.cos(phi) * r;
+    }
+    particleGeo.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+    const particleMat = new THREE.PointsMaterial({
+      color: 0xd4bf8b,
+      size: 0.035,
+      transparent: true,
+      opacity: 0.6,
+      blending: THREE.AdditiveBlending,
+    });
+    const particles = new THREE.Points(particleGeo, particleMat);
+    group.add(particles);
+
+    // tiny sparkles
+    const sparkleGeo = new THREE.BufferGeometry();
+    const sparkPos = new Float32Array(300 * 3);
+    for (let i = 0; i < 300; i++) {
+      const r = 1.8 + Math.random() * 2.2;
+      const theta = Math.random() * Math.PI * 2;
+      const phi = Math.acos((Math.random() * 2) - 1);
+      sparkPos[i*3] = Math.sin(phi) * Math.cos(theta) * r;
+      sparkPos[i*3+1] = Math.sin(phi) * Math.sin(theta) * r;
+      sparkPos[i*3+2] = Math.cos(phi) * r;
+    }
+    sparkleGeo.setAttribute('position', new THREE.BufferAttribute(sparkPos, 3));
+    const sparkleMat = new THREE.PointsMaterial({
+      color: 0xe8dcc0,
+      size: 0.015,
+      transparent: true,
+      blending: THREE.AdditiveBlending,
+    });
+    const sparkles = new THREE.Points(sparkleGeo, sparkleMat);
+    group.add(sparkles);
+
+    scene.add(group);
+
+    // ---- floating subtle background stars ----
+    const starGeo = new THREE.BufferGeometry();
+    const starPos = new Float32Array(600 * 3);
+    for (let i = 0; i < 600; i++) {
+      const r = 6 + Math.random() * 8;
+      const theta = Math.random() * Math.PI * 2;
+      const phi = Math.acos((Math.random() * 2) - 1);
+      starPos[i*3] = Math.sin(phi) * Math.cos(theta) * r;
+      starPos[i*3+1] = Math.sin(phi) * Math.sin(theta) * r;
+      starPos[i*3+2] = Math.cos(phi) * r;
+    }
+    starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
+    const starMat = new THREE.PointsMaterial({
+      color: 0x8a7f6a,
+      size: 0.03,
+      transparent: true,
+      opacity: 0.25,
+      blending: THREE.AdditiveBlending,
+    });
+    const stars = new THREE.Points(starGeo, starMat);
+    scene.add(stars);
+
+    // ---- animation loop ----
+    let clock = new THREE.Clock();
+
+    function animate() {
+      const delta = clock.getDelta();
+      const elapsed = performance.now() / 1000;
+
+      group.rotation.x = Math.sin(elapsed * 0.12) * 0.25;
+      group.rotation.y += 0.0025;
+      group.rotation.z = Math.sin(elapsed * 0.08) * 0.08;
+
+      // float
+      group.position.y = Math.sin(elapsed * 0.4) * 0.08;
+      group.position.x = Math.sin(elapsed * 0.2) * 0.05;
+
+      // particles drift
+      particles.rotation.y += 0.0003;
+      sparkles.rotation.y -= 0.0002;
+      stars.rotation.y += 0.0001;
+
+      renderer.render(scene, camera);
+      requestAnimationFrame(animate);
+    }
+
+    animate();
+
+    // ---- resize ----
+    window.addEventListener('resize', () => {
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+      renderer.setSize(w, h);
+    });
+
+  </script>
+</body>
+</html>
